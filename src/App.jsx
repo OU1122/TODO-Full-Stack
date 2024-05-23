@@ -7,7 +7,7 @@ import ActionBar from "./component/action-bar";
 export default function App() {
 	const [todo, setTodo] = useState({ name: "", completed: false });
 	const [todos, setTodos] = useState([]);
-	const [isCompleted, setIsCompleted] = useState(null);
+	const [filterView, setFilterView] = useState("all");
 
 	const handleChange = (e) => {
 		setTodo({ ...todo, name: e.target.value });
@@ -17,44 +17,56 @@ export default function App() {
 		e.preventDefault();
 
 		setTodos([...todos, todo]);
-		setTodo({ name: "", compelted: false });
+		setTodo({ name: "", completed: false });
 	};
 
-	console.log(todos);
-
-	const filterActive = () => {};
-
-	const filterCompleted = (todo) => {
-		const newArray = todos.filter((t) => t !== todo);
+	const clearCompleted = () => {
+		const newArray = todos.filter((item) => !item.completed);
 		setTodos(newArray);
+		console.log(newArray);
 	};
+
+	const filteredTodos = todos.filter((todo) => {
+		if (filterView === "all") return true;
+		if (filterView === "active") return !todo.completed;
+		if (filterView === "completed") return todo.completed;
+	});
 
 	return (
 		<>
-			<div>
-				<img
-					className="absolute -z-50"
-					src="../src/assets/bg-desktop-light.jpg"></img>
-			</div>
-			<div className="h-screen flex flex-col items-center justify-center">
-				<div className="w-[600px]">
-					<div className="text-left">
-						<h1 className="text-3xl text-slate-50 rounded-2xl">Todo</h1>
-					</div>
-					<div className="wrapper">
-						<Input
-							todo={todo}
-							setTodo={setTodo}
-							handleSubmit={handleSubmit}
-							handleChange={handleChange}
-						/>
-						<Tasks
-							todos={todos}
-							setTodos={setTodos}
-							isCompleted={isCompleted}
-							setIsCompleted={setIsCompleted}
-						/>
-						<ActionBar todos={todos} />
+			<div className="bg-black h-screen w-screen bg-opacity-[0.1]">
+				<div className="">
+					<img
+						className="absolute -z-50 h-screen w-screen object-cover"
+						src="../src/assets/bg.jpg"></img>
+				</div>
+				<div className="absolute top-[170px] left-1/2 -translate-x-[300px] flex flex-col items-center ">
+					<div className="w-[600px]">
+						<div className="text-left">
+							<h1 className="text-3xl text-slate-50 rounded-2xl font-bold tracking-wider drop-shadow-2xl uppercase">
+								Todo
+							</h1>
+						</div>
+						<div className="wrapper">
+							<Input
+								todo={todo}
+								setTodo={setTodo}
+								handleSubmit={handleSubmit}
+								handleChange={handleChange}
+							/>
+
+							<Tasks
+								filteredTodos={filteredTodos}
+								todos={todos}
+								setTodos={setTodos}
+							/>
+							<ActionBar
+								filterView={filterView}
+								setFilterView={setFilterView}
+								todos={todos}
+								clearCompleted={clearCompleted}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
