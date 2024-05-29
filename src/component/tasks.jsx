@@ -1,46 +1,42 @@
 import React from "react";
-import clsx from "clsx";
+import DroppableTasks from "../component/droppable-tasks";
 
-export default function Tasks({ todos, setTodos, filteredTodos }) {
-	const handleClick = (todo) => {
-		let updatedTodos = todos.map((item) =>
-			item.name === todo.name
-				? { ...item, completed: !item.completed }
-				: item
-		);
-
-		setTodos(updatedTodos);
+export default function Tasks({
+	setTodo,
+	todos,
+	setTodos,
+	filteredTodos,
+	filterView,
+}) {
+	const toggleComplete = async (todo) => {
+		try {
+			const updatedTodo = { ...todo, completed: !todo.completed };
+			const response = await fetch(
+				`http://localhost:3000/todos/${todo.todo_id}`,
+				{
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(updatedTodo),
+				}
+			);
+			console.log(response);
+			setTodos(
+				todos.map((t) => (t.todo_id === todo.todo_id ? updatedTodo : t))
+			);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (
-		<div className="bg-white rounded-tl-xl rounded-tr-xl drop-shadow-xl">
-			<ul>
-				{filteredTodos.length > 0 ? (
-					filteredTodos.map((todo, index) => (
-						<li
-							className={clsx(
-								"flex flex-row items-center gap-4 p-4 border-b-2 text-slate-800",
-								todo.completed && "text-slate-400 line-through"
-							)}
-							onClick={() => handleClick(todo)}
-							key={index}>
-							<span className="h-5 w-5">
-								<img
-									src={
-										todo.completed
-											? "../src/assets/icon-check.svg"
-											: "../src/assets/icon-circle.svg"
-									}></img>
-							</span>
-							{todo.name}
-						</li>
-					))
-				) : (
-					<li className="flex flex-row items-center gap-4 p-4 border-b-2 text-slate-800">
-						Add a task to your list ⬆️
-					</li>
-				)}
-			</ul>
+		<div className="sm:max-h-52 max-h-72 overflow-y-scroll rounded-tl-xl rounded-tr-xl">
+			<DroppableTasks
+				todos={todos}
+				setTodos={setTodos}
+				filteredTodos={filteredTodos}
+				toggleComplete={toggleComplete}
+				filterView={filterView}
+			/>
 		</div>
 	);
 }

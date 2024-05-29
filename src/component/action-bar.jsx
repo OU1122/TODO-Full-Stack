@@ -16,9 +16,9 @@ export default function ActionBar({
 	}, [todos]);
 
 	return (
-		<div className="p-4 relative drop-shadow-2xl bg-white rounded-bl-xl rounded-br-xl">
-			<div className="flex flex-row justify-between items-center px-4">
-				<div className="text-slate-600 hover:text-sky-700 font-semibold tracking-wider">
+		<div className="relative drop-shadow-2xl border-t-2 bg-slate-50/95 rounded-bl-xl rounded-br-xl">
+			<div className="flex gap-2 px-4 sm:flex-row justify-between items-center sm:px-4 py-4 bg-slate-50/95 rounded-bl-xl rounded-br-xl">
+				<div className="text-slate-600 bg-slate-50/95 hover:text-sky-700 font-semibold tracking-wider">
 					{left !== null && left !== 1
 						? ` ${left} items left`
 						: `${left} item left`}
@@ -33,7 +33,7 @@ export default function ActionBar({
 					</button>
 				</div>
 			</div>
-			<div className=" text-slate-600 flex absolute top-4 left-1/2 flex-row gap-4 -translate-x-24">
+			<div className=" text-slate-600 flex bg-slate-50/95 p-4 sm:p-0 sm:top-4 items-center justify-center border-t-2 rounded-bl-xl rounded-br-xl sm:border-hidden  sm:absolute sm:left-1/2 flex-row gap-4 sm:-translate-x-24">
 				<button
 					type="button"
 					onClick={() => setFilterView("all")}

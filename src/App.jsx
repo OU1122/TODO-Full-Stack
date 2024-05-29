@@ -1,8 +1,13 @@
 import React from "react";
 import Input from "./component/input";
 import Tasks from "./component/tasks";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ActionBar from "./component/action-bar";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
+import axios from "axios";
+import LoginButton from "./component/login-button";
 
 export default function App() {
 	const [todo, setTodo] = useState({ name: "", completed: false });
@@ -13,17 +18,56 @@ export default function App() {
 		setTodo({ ...todo, name: e.target.value });
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		setTodos([...todos, todo]);
-		setTodo({ name: "", completed: false });
+		try {
+			const body = todo;
+			const response = await fetch("http://localhost:3000/todos", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(body),
+			});
+			const newTodo = await response.json();
+			console.log(newTodo);
+			setTodos((prevTodos) => [...prevTodos, newTodo]);
+			setTodo({ name: "", completed: false });
+		} catch (err) {
+			console.error(err);
+		}
 	};
 
-	const clearCompleted = () => {
-		const newArray = todos.filter((item) => !item.completed);
-		setTodos(newArray);
-		console.log(newArray);
+	const fetchTodos = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/todos", {
+				method: "GET",
+				headers: { "Content-Type": "application/json" },
+			});
+			if (!response.ok) {
+				throw new Error("Failed to fetch todos");
+			}
+			const todos = await response.json();
+
+			setTodos(todos.rows);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchTodos();
+	}, []);
+
+	const clearCompleted = async () => {
+		try {
+			const deleteTodo = await fetch("http://localhost:3000/todos", {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+			});
+		} catch (error) {
+			console.error(error);
+		}
+		fetchTodos();
 	};
 
 	const filteredTodos = todos.filter((todo) => {
@@ -33,16 +77,12 @@ export default function App() {
 	});
 
 	return (
-		<>
+		<DndProvider backend={HTML5Backend}>
 			<div className="bg-black h-screen w-screen bg-opacity-[0.1]">
-				<div className="">
-					<img
-						className="absolute -z-50 h-screen w-screen object-cover"
-						src="../src/assets/bg.jpg"></img>
-				</div>
-				<div className="absolute top-[170px] left-1/2 -translate-x-[300px] flex flex-col items-center ">
-					<div className="w-[600px]">
-						<div className="text-left">
+				<div className="absolute -z-50 bg-[url('../src/assets/bg.jpg')] bg-cover w-screen h-screen"></div>
+				<div className="sm:absolute sm:top-[170px] sm:left-1/2 sm:-translate-x-[330px] flex flex-col items-center px-10">
+					<div className="w-full sm:w-[600px] mt-20 sm:mt-0">
+						<div className="text-left flex flex-row justify-between">
 							<h1 className="text-3xl text-slate-50 rounded-2xl font-bold tracking-wider drop-shadow-2xl uppercase">
 								Todo
 							</h1>
@@ -54,11 +94,12 @@ export default function App() {
 								handleSubmit={handleSubmit}
 								handleChange={handleChange}
 							/>
-
 							<Tasks
 								filteredTodos={filteredTodos}
 								todos={todos}
+								setTodo={setTodo}
 								setTodos={setTodos}
+								filterView={filterView}
 							/>
 							<ActionBar
 								filterView={filterView}
@@ -70,6 +111,6 @@ export default function App() {
 					</div>
 				</div>
 			</div>
-		</>
+		</DndProvider>
 	);
 }
