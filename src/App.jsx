@@ -6,9 +6,6 @@ import ActionBar from "./component/action-bar";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import axios from "axios";
-import LoginButton from "./component/login-button";
-
 export default function App() {
 	const [todo, setTodo] = useState({ name: "", completed: false });
 	const [todos, setTodos] = useState([]);
@@ -20,29 +17,36 @@ export default function App() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		if (todo.name !== "") {
+			try {
+				const body = todo;
+				const response = await fetch(
+					"https://react-todo-v4.onrender.com/todos",
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(body),
+					}
+				);
+				const newTodo = await response.json();
 
-		try {
-			const body = todo;
-			const response = await fetch("http://localhost:3000/todos", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(body),
-			});
-			const newTodo = await response.json();
-			console.log(newTodo);
-			setTodos((prevTodos) => [...prevTodos, newTodo]);
-			setTodo({ name: "", completed: false });
-		} catch (err) {
-			console.error(err);
+				setTodos((prevTodos) => [...prevTodos, newTodo]);
+				setTodo({ name: "", completed: false });
+			} catch (err) {
+				console.error(err);
+			}
 		}
 	};
 
 	const fetchTodos = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/todos", {
-				method: "GET",
-				headers: { "Content-Type": "application/json" },
-			});
+			const response = await fetch(
+				`https://react-todo-v4.onrender.com/todos`,
+				{
+					method: "GET",
+					headers: { "Content-Type": "application/json" },
+				}
+			);
 			if (!response.ok) {
 				throw new Error("Failed to fetch todos");
 			}
@@ -60,10 +64,13 @@ export default function App() {
 
 	const clearCompleted = async () => {
 		try {
-			const deleteTodo = await fetch("http://localhost:3000/todos", {
-				method: "DELETE",
-				headers: { "Content-Type": "application/json" },
-			});
+			const deleteTodo = await fetch(
+				"https://react-todo-v4.onrender.com/todos",
+				{
+					method: "DELETE",
+					headers: { "Content-Type": "application/json" },
+				}
+			);
 		} catch (error) {
 			console.error(error);
 		}

@@ -12,14 +12,14 @@ export default function Tasks({
 		try {
 			const updatedTodo = { ...todo, completed: !todo.completed };
 			const response = await fetch(
-				`http://localhost:3000/todos/${todo.todo_id}`,
+				`https://react-todo-v4.onrender.com/todos/${todo.todo_id}`,
 				{
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(updatedTodo),
 				}
 			);
-			console.log(response);
+
 			setTodos(
 				todos.map((t) => (t.todo_id === todo.todo_id ? updatedTodo : t))
 			);
