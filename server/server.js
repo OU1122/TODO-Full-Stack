@@ -1,15 +1,10 @@
 import express from "express";
 import cors from "cors";
 import pool from "./db.js";
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
+
 import passport from "passport";
 
 const app = express();
-
-// SESSION MIDDLEWARE
-// ENV before DEPLOYMENT!!
-const pgSession = connectPgSimple(session);
 
 app.use(cors());
 app.use(express.json());
@@ -50,7 +45,7 @@ app.post("/todos", async (req, res) => {
 
 app.get("/todos", async (req, res) => {
 	try {
-		const todos = await pool.query("SELECT * FROM todo");
+		const { rows: todos } = await pool.query("SELECT * FROM todo");
 		res.json(todos);
 	} catch (err) {
 		console.error(err);
